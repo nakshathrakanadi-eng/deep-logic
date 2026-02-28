@@ -54,7 +54,11 @@ Place Order
 </section>
 
 <!-- ORDER MODAL -->
-<div id="orderConfirmation" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;justify-content:center;align-items:center">
+<div id="orderConfirmation"
+     style="display:none;position:fixed;inset:0;
+            background:rgba(0,0,0,.6);
+            justify-content:center;align-items:center">
+
   <div style="background:white;padding:20px;border-radius:10px;width:300px;text-align:center">
     <h2>✅ Order Placed</h2>
     <p id="orderId"></p>
@@ -62,7 +66,6 @@ Place Order
     <div id="orderSummary"></div>
     <button onclick="closeOrderModal()" style="margin-top:10px">Close</button>
   </div>
-</div>
 
 <footer>© 2026 College Canteen</footer>
 
@@ -76,6 +79,8 @@ Place Order
 firebase.auth().onAuthStateChanged(user=>{
   if(!user) location.href="login.html";
 });
+
+document.getElementById("orderConfirmation").style.display = "none";
 
 // ---------- DATA ----------
 const foodItems=[

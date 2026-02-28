@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>College Canteen</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+}
+
+header {
+    background: #91b7e7;
+    color: white;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h2 {
+    font-size: 22px;
+}
+
+nav button {
+    margin-left: 10px;
+    padding: 6px 12px;
+    border: none;
+    background: white;
+    color: #ff6b00;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+section {
+    padding: 40px;
+}
+
+h2.section-title {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.menu-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    width: 220px;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+    margin-bottom: 8px;
+}
+
+.price {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.available {
+    color: green;
+    font-weight: bold;
+}
+
+.out {
+    color: red;
+    font-weight: bold;
+}
+
+.card button {
+    margin-top: 10px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #ff6b00;
+    color: white;
+}
+
+.card button:disabled {
+    background: gray;
+    cursor: not-allowed;
+}
+
+.cart {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 30px;
+}
+
+.cart-item {
+    margin-bottom: 8px;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background: #333;
+    color: white;
+    margin-top: 40px;
+}
+
+@media(max-width:768px){
+    .menu-container {
+        justify-content: center;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>🍔 Campus Canteen</h2>
+    <nav>
+        <button onclick="filterCategory('All')">All</button>
+        <button onclick="filterCategory('Snacks')">Snacks</button>
+        <button onclick="filterCategory('Cool Drinks')">Cool Drinks</button>
+        <button onclick="filterCategory('Veg')">Veg</button>
+        <button onclick="filterCategory('Non-Veg')">Non-Veg</button>
+    </nav>
+</header>
+
+<section>
+    <h2 class="section-title">Menu</h2>
+    <div class="menu-container" id="menu"></div>
+
+    <div class="cart">
+    <h2>🛒 Cart</h2>
+    <div id="cartItems"></div>
+    <p><strong>Total: ₹<span id="total">0</span></strong></p>
+    <button onclick="clearCart()" style="margin-top:10px; padding:6px 12px; background:red; color:white; border:none; border-radius:5px; cursor:pointer;">
+        Clear Cart
+    </button>
+</div>
+<!-- Order Confirmation Modal -->
+<div id="orderConfirmation" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+    background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000;">
+    <div style="background:white; padding:20px; border-radius:10px; width:300px; text-align:center; position:relative;">
+        <h2>✅ Order Placed!</h2>
+        <p id="orderId"></p>
+        <p id="pickupTime"></p>
+        <div id="orderSummary"></div>
+        <button onclick="closeOrderModal()" style="margin-top:15px; padding:6px 12px; background:#ff6b00; color:white; border:none; border-radius:5px; cursor:pointer;">Close</button>
+    </div>
+</div>
+
+</section>
+
+<footer>
+    © 2026 College Canteen
+</footer>
+
+<script>
+// Food Data
+const foodItems = [
+    { name: "Samosa", category: "Snacks", price: 20, available: true },
+    { name: "Burger", category: "Snacks", price: 40, available: false },
+    { name: "Coke", category: "Cool Drinks", price: 30, available: true },
+    { name: "Pepsi", category: "Cool Drinks", price: 30, available: true },
+    { name: "Veg Meals", category: "Veg", price: 80, available: true },
+    { name: "Paneer Curry", category: "Veg", price: 90, available: false },
+    { name: "Chicken Biryani", category: "Non-Veg", price: 120, available: true },
+    { name: "Egg Roll", category: "Non-Veg", price: 50, available: true }
+];
+
+let cart = [];
+
+// Display Menu
+function displayMenu(items) {
+    const menu = document.getElementById("menu");
+    menu.innerHTML = "";
+
+    items.forEach((item, index) => {
+        menu.innerHTML += `
+            <div class="card">
+                <h3>${item.name}</h3>
+                <p>Category: ${item.category}</p>
+                <p class="price">₹${item.price}</p>
+                <p class="${item.available ? 'available' : 'out'}">
+                    ${item.available ? 'Available' : 'Out of Stock'}
+                </p>
+                <button 
+                    onclick="addToCart(${index})"
+                    ${item.available ? '' : 'disabled'}>
+                    Add to Cart
+                </button>
+            </div>
+        `;
+    });
+}
+
+// Filter Category
+function filterCategory(category) {
+    if (category === "All") {
+        displayMenu(foodItems);
+    } else {
+        const filtered = foodItems.filter(item => item.category === category);
+        displayMenu(filtered);
+    }
+}
+
+// Add to Cart
+function addToCart(index) {
+    const item = foodItems[index];
+    cart.push(item);
+    updateCart();
+}
+
+// Update Cart
+function updateCart() {
+    const cartDiv = document.getElementById("cartItems");
+    const totalDiv = document.getElementById("total");
+    cartDiv.innerHTML = "";
+
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        total += item.price;
+        cartDiv.innerHTML += `
+            <div class="cart-item">
+                ${item.name} - ₹${item.price} 
+                <button onclick="removeFromCart(${index})" style="margin-left:10px; padding:2px 6px; font-size:0.8rem;">❌</button>
+            </div>
+            
+    }
+        ` ;
+    });
+
+    totalDiv.innerText = total;
+}
+// Remove a single item from the cart
+function removeFromCart(index) {
+    cart.splice(index, 1); // remove the item
+    updateCart(); // refresh cart display
+}
+
+// Clear all items from the cart
+function clearCart() {
+    cart = [];
+    updateCart();
+}
+
+// Initial Load
+displayMenu(foodItems);
+</script>
+
+</body>
+</html>

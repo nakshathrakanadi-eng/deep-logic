@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Canteen Worker Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    padding: 20px;
+}
+h2 {
+    text-align: center;
+}
+.order {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.order h3 {
+    margin-bottom: 8px;
+}
+.order p {
+    margin: 4px 0;
+}
+button {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.ready {
+    background: orange;
+    color: white;
+}
+.done {
+    background: green;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<h2>👨‍🍳 Canteen Orders</h2>
+
+<div id="orders"></div>
+
+<script>
+function loadOrders() {
+    const ordersDiv = document.getElementById("orders");
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+    ordersDiv.innerHTML = "";
+
+    if (orders.length === 0) {
+        ordersDiv.innerHTML = "<p>No orders yet</p>";
+        return;
+    }
+
+    orders.forEach((order, index) => {
+        ordersDiv.innerHTML += `
+            <div class="order">
+                <h3>Order ID: ${order.orderId}</h3>
+                <p><strong>Items:</strong> ${order.items.join(", ")}</p>
+                <p><strong>Pickup Time:</strong> ${order.pickupTime}</p>
+                <p><strong>Status:</strong> ${order.status}</p>
+
+                <button class="ready" onclick="updateStatus(${index}, 'Ready')">
+                    Mark Ready
+                </button>
+                <button class="done" onclick="updateStatus(${index}, 'Completed')">
+                    Completed
+                </button>
+            </div>
+        `;
+    });
+}
+
+function updateStatus(index, newStatus) {
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders[index].status = newStatus;
+    localStorage.setItem("orders", JSON.stringify(orders));
+    loadOrders();
+}
+
+loadOrders();
+</script>
+
+</body>
+</html>
